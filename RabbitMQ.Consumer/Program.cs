@@ -1,5 +1,6 @@
 ﻿using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Consumer;
 using System.Text;
 
 var factory = new ConnectionFactory
@@ -10,20 +11,4 @@ var factory = new ConnectionFactory
 using var connection = factory.CreateConnection();
 using var channel = connection.CreateModel();
 
-channel.QueueDeclare("demo-queue",
-    durable: true,
-    exclusive: false,
-    autoDelete: false,
-    arguments: null);
-
-var consumer = new EventingBasicConsumer(channel);
-consumer.Received += (sender, args) =>
-{
-    var body = args.Body.ToArray();
-    var message = Encoding.UTF8.GetString(body);
-    Console.WriteLine(message);
-};
-
-channel.BasicConsume("demo-queue", true, consumer);
-  
-Console.ReadKey();
+QueueConsumer.Consumer(channel);
